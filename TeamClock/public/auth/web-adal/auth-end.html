@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <script src="https://secure.aadcdn.microsoftonline-p.com/lib/1.0.17/js/adal.min.js" crossorigin="anonymous"></script>
+
+  <script type="text/javascript">
+    // ADAL.js configuration
+    let config = {
+      clientId: "a842abce-51a3-4ca8-9061-86be678fb773",
+      cacheLocation: "localStorage",
+      navigateToLoginRequestUrl: false,
+      endpoints: {
+        "https://graph.microsoft.com": "https://graph.microsoft.com"
+      }
+    };
+
+    let authContext = new AuthenticationContext(config);
+
+    // ensure page loaded via Azure AD callback
+    if (authContext.isCallback(window.location.hash)) {
+      authContext.handleWindowCallback(window.location.hash);
+
+      // if able to retrieve current user...
+      if (authContext.getCachedUser()) {
+        authContext.acquireToken("https://graph.microsoft.com", function (error, token) {
+            if (token) {
+              window.location.replace(window.location.origin + "/#/web?t=" + token);
+            } else if (error) {
+              console.error(error);
+            } else {
+              console.error("UnexpectedFailure");
+            }
+          });
+      } else {
+        console.error(authContext.getLoginError());
+      }
+    }
+  </script>
+</body>
+</html>
